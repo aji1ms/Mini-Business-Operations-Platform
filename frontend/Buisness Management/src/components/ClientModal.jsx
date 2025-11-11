@@ -86,7 +86,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, mode = "add", clientData = {} 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div
-                className="fixed inset-0 bg-opacity-50 transition-opacity backdrop-blur-2xl"
+                className="fixed inset-0 bg-opacity-50 transition-opacity bg-black/50 backdrop-blur-2xl"
                 onClick={handleClose}
             />
 

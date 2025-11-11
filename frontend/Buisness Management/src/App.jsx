@@ -4,6 +4,7 @@ import Projects from "./pages/Projects";
 import ActivityLogs from "./pages/ActivityLogs";
 import Clients from "./pages/Clients";
 import ProjectModal from "./components/ProjectModal";
+import Members from "./pages/Members";
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <Route path="/clients" element={<Clients />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/activitys" element={<ActivityLogs />} />
+        <Route path="/members" element={<Members />} />
       </Routes>
     </BrowserRouter>
   )

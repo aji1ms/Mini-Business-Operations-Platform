@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import {
-    LayoutDashboard,
     Users,
     FolderKanban,
     Activity,
-    Search,
     CheckCircle,
     AlertCircle,
 } from 'lucide-react';

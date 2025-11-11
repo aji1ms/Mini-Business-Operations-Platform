@@ -1,4 +1,4 @@
-import { Calendar, Edit, Eye, Filter, Plus, Search } from "lucide-react";
+import { Calendar, Edit, Eye, Filter, Plus, Search, Trash2 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { useState } from "react";
@@ -164,6 +164,10 @@ const Projects = () => {
                                                     }}
                                                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
                                                     <Edit size={16} />
+                                                </button>
+                                                <button
+                                                    className="p-2 text-red-600 hover:bg-gray-100 rounded-lg transition">
+                                                    <Trash2 size={16} />
                                                 </button>
                                             </div>
                                         </td>
