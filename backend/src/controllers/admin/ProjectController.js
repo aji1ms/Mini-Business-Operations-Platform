@@ -1,6 +1,7 @@
 import Project from "../../models/projectSchema.js";
 import Client from "../../models/clientSchema.js";
 import User from "../../models/userSchema.js";
+import { createActivity } from "./activityController.js";
 
 // Create Project
 
@@ -25,6 +26,14 @@ export const addProject = async (req, res) => {
         const populatedProject = await Project.findById(project._id)
             .populate("clientId", "name company")
             .populate("assignedDevelopers", "name email");
+
+        await createActivity(
+            "Project Created",
+            req.user._id,
+            "Project",
+            project._id,
+            `Created project ${title} for client ID ${clientId}`
+        );
 
         res.status(201).json({ message: "Project created successfully", project: populatedProject });
     } catch (error) {
@@ -138,6 +147,13 @@ export const updateProject = async (req, res) => {
             .populate("clientId", "name company")
             .populate("assignedDevelopers", "name email");
 
+        await createActivity(
+            "Project Updated",
+            req.user._id,
+            "Project",
+            project._id,
+            `Updated project ${project.title} — status: ${project.status}`
+        );
 
         return res.status(200).json({
             message: "Project updated successfully",
@@ -157,6 +173,14 @@ export const deleteProject = async (req, res) => {
         const { id } = req.params;
         const project = await Project.findByIdAndDelete(id);
         if (!project) return res.status(404).json({ message: "Project not found" });
+
+        await createActivity(
+            "Project Deleted",
+            req.user._id,
+            "Project",
+            id,
+            `Deleted project ${project.title}`
+        );
 
         res.status(200).json({ message: "Project deleted successfully" });
     } catch (error) {

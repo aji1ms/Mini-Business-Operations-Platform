@@ -5,6 +5,7 @@ import adminStaffReducer from "./slices/admin/adminStaffSlice";
 import adminClientReducer from "./slices/admin/adminClientSlice";
 import adminProjectSlice from "./slices/admin/adminProjectSlice";
 import adminTaskSlice from "./slices/admin/adminTaskSlice";
+import adminActivitySlice from "./slices/admin/adminActivitySlice";
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         clients: adminClientReducer,
         projects: adminProjectSlice,
         tasks: adminTaskSlice,
+        activities: adminActivitySlice,
 
         // STAFF
         staff: staffReducer,

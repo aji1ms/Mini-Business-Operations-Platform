@@ -1,6 +1,7 @@
 import Task from "../../models/taskSchema.js";
 import Project from "../../models/projectSchema.js";
 import User from "../../models/userSchema.js";
+import { createActivity } from "./activityController.js";
 
 // Add Task
 
@@ -41,6 +42,14 @@ export const addTask = async (req, res) => {
             dueDate,
             createdBy: req.user._id,
         });
+
+        await createActivity(
+            "Task Created",
+            req.user._id,
+            "Task",
+            task._id,
+            `Created task ${title} for project ${project.title}`
+        );
 
         const populatedTask = await task.populate([
             { path: "projectId", select: "title" },
@@ -118,6 +127,14 @@ export const updateTask = async (req, res) => {
 
         await task.save();
 
+        await createActivity(
+            "Task Updated",
+            req.user._id,
+            "Task",
+            task._id,
+            `Updated task ${task.title} - status: ${status}`
+        );
+
         const updatedTask = await task.populate([
             { path: "projectId", select: "title" },
             { path: "assignedTo", select: "name email" },
@@ -141,6 +158,14 @@ export const deleteTask = async (req, res) => {
 
         const task = await Task.findByIdAndDelete(id);
         if (!task) return res.status(404).json({ message: "Task not found!" });
+
+        await createActivity(
+            "Task Deleted",
+            req.user._id,
+            "Task",
+            id,
+            `Deleted task - ${task.title} (${task.description})`
+        );
 
         return res.status(200).json({
             message: "Task deleted successfully",

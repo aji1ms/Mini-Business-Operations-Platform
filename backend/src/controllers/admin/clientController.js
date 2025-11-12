@@ -1,4 +1,5 @@
 import Client from "../../models/clientSchema.js";
+import { createActivity } from "./activityController.js";
 
 // Add Client
 
@@ -22,6 +23,14 @@ export const addClient = async (req, res) => {
             status: status || "New",
             createdBy: req.user._id,
         });
+
+        await createActivity(
+            "Client Added",
+            req.user._id,
+            "Client",
+            client._id,
+            `Added client ${name} (${company}) with email ${email}`
+        );
 
         return res.status(201).json({ message: "Client added successfully", client });
     } catch (error) {
@@ -114,6 +123,15 @@ export const updateClient = async (req, res) => {
         client.status = status || client.status;
 
         await client.save();
+
+        await createActivity(
+            "Client Updated",
+            req.user._id,
+            "Client",
+            client._id,
+            `Updated client ${client.name} (${client.company})`
+        );
+
         return res.status(200).json({ message: "Client updated successfully", client });
     } catch (error) {
         console.error("Error updating client:", error);
@@ -128,6 +146,14 @@ export const deleteClient = async (req, res) => {
         const { id } = req.params;
         const client = await Client.findByIdAndDelete(id);
         if (!client) return res.status(404).json({ message: "Client not found" });
+
+        await createActivity(
+            "Client Deleted",
+            req.user._id,
+            "Client",
+            id,
+            `Deleted client ${client.name} (${client.company})`
+        );
 
         return res.status(200).json({ message: "Client deleted successfully" });
     } catch (error) {

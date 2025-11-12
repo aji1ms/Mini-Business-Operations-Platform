@@ -1,4 +1,5 @@
 import User from "../../models/userSchema.js";
+import { createActivity } from "./activityController.js";
 
 // Get all staff
 
@@ -116,6 +117,14 @@ export const createStaff = async (req, res) => {
 
         await newStaff.save();
 
+        await createActivity(
+            "Staff Created",
+            req.user._id,
+            "User",
+            newStaff._id,
+            `Created ${role} account for ${name} (${email})`
+        );
+
         return res.status(201).json({
             message: "Staff member created successfully",
             staff: {
@@ -172,6 +181,14 @@ export const updateStaff = async (req, res) => {
 
         await staff.save();
 
+        await createActivity(
+            "Staff Updated",
+            req.user._id,
+            "User",
+            staff._id,
+            `Updated ${role} details for ${staff.name} (${staff.email})`
+        );
+
         return res.status(200).json({
             message: "Staff updated successfully",
             staff,
@@ -192,6 +209,14 @@ export const deleteStaff = async (req, res) => {
         if (!staff) {
             return res.status(404).json({ message: "Staff not found" });
         }
+
+        await createActivity(
+            "Staff Deleted",
+            req.user._id,
+            "User",
+            id,
+            `Deleted ${staff.role} account: ${staff.name} (${staff.email})`
+        );
 
         return res
             .status(200)
