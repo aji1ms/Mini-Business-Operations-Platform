@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import staffReducer from "./slices/staff/staffSlice";
 import adminAuthReducer from "./slices/admin/adminAuthSlice";
 import adminStaffReducer from "./slices/admin/adminStaffSlice";
 import adminClientReducer from "./slices/admin/adminClientSlice";
 import adminProjectSlice from "./slices/admin/adminProjectSlice";
 import adminTaskSlice from "./slices/admin/adminTaskSlice";
 import adminActivitySlice from "./slices/admin/adminActivitySlice";
+import staffReducer from "./slices/staff/staffSlice";
+import staffProjectReducer from "./slices/staff/projectSlice";
+import staffTaskReducer from "./slices/staff/taskSlice";
 
 const store = configureStore({
     reducer: {
@@ -19,6 +21,8 @@ const store = configureStore({
 
         // STAFF
         staff: staffReducer,
+        staffProjects: staffProjectReducer,
+        staffTasks: staffTaskReducer,
     }
 })
 

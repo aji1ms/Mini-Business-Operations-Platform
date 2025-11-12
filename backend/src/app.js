@@ -9,6 +9,8 @@ import projectRoute from "./routes/projectRoutes.js";
 import clientRoute from "./routes/clientRoutes.js";
 import taskRoute from "./routes/taskRoutes.js";
 import activityRoute from "./routes/activityRoutes.js";
+import staffProjectRoute from "./routes/staffProjectRoutes.js";
+import staffTaskRoutes from "./routes/staffTaskRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -30,13 +32,17 @@ app.use(cookieParser());
 
 connectDb();
 
-
+// Admin
 app.use("/api/admin", adminRoute);
 app.use("/api/staff", staffRoute);
 app.use("/api/admin/project", projectRoute);
 app.use("/api/admin/task", taskRoute);
 app.use("/api/admin/client", clientRoute);
 app.use("/api/admin/activity", activityRoute);
+
+// Staff
+app.use("/api/staff/projects", staffProjectRoute);
+app.use("/api/staff/tasks", staffTaskRoutes);
 
 const PORT = process.env.PORT || 3008;
 app.listen(PORT, () => console.log('Server Running....'));              

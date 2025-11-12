@@ -17,7 +17,7 @@ export const adminLogin = createAsyncThunk(
                 `${import.meta.env.VITE_BACKEND_URL}/api/admin/login`,
                 credentials,
                 { withCredentials: true }
-            );
+            );      
 
             const res = await axios.get(
                 `${import.meta.env.VITE_BACKEND_URL}/api/admin/getInfo`,

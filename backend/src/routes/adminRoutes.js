@@ -5,20 +5,18 @@ import { getAllStaff, getStaffById, updateStaff, deleteStaff, createStaff } from
 
 const router = express.Router();
 
-router.use(authenticateUser(["admin"], "adminToken"));
-
 // Login Management
 
 router.post("/login", loginAdmin);
-router.get("/getInfo", getAdminInfo)
-router.post("/logout", logoutAdmin)
+router.get("/getInfo", authenticateUser(["admin"], "adminToken"), getAdminInfo)
+router.post("/logout", authenticateUser(["admin"], "adminToken"), logoutAdmin)
 
 // Staff Management
 
-router.get("/staff", getAllStaff);
-router.post("/staff/add", createStaff);
-router.get("/staff/:id", getStaffById);
-router.put("/staff/edit/:id", updateStaff);
-router.delete("/staff/delete/:id", deleteStaff);
+router.get("/staff", authenticateUser(["admin"], "adminToken"), getAllStaff);
+router.post("/staff/add", authenticateUser(["admin"], "adminToken"), createStaff);
+router.get("/staff/:id", authenticateUser(["admin"], "adminToken"), getStaffById);
+router.put("/staff/edit/:id", authenticateUser(["admin"], "adminToken"), updateStaff);
+router.delete("/staff/delete/:id", authenticateUser(["admin"], "adminToken"), deleteStaff);
 
 export default router;

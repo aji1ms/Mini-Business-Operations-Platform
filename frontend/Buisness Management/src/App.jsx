@@ -6,7 +6,6 @@ import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import AdminLogin from "./pages/auth/AdminLogin";
 import StaffDashboard from "./pages/staff/StaffDashboard";
-import Dashboard from "./pages/admin/Dashboard";
 import Projects from "./pages/admin/Projects";
 import Clients from "./pages/admin/Clients";
 import ActivityLogs from "./pages/admin/ActivityLogs";
@@ -16,6 +15,9 @@ import StaffProtected from "./routes/StaffProtected";
 import AdminProtected from "./routes/AdminProtected";
 import { fetchAdmin } from "./Redux/slices/admin/adminAuthSlice";
 import Tasks from "./pages/admin/Tasks";
+import Dashboard from "./pages/admin/Dashboard";
+import StaffProject from "./pages/staff/StaffProject";
+import StaffTask from "./pages/staff/StaffTask";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -39,6 +41,8 @@ const App = () => {
 
         <Route element={<StaffProtected />}>
           <Route path="/" element={<StaffDashboard />} />
+          <Route path="/staff/projects" element={<StaffProject />} />
+          <Route path="/staff/tasks" element={<StaffTask />} />
         </Route>
 
         {/* ADMIN ROUTES */}

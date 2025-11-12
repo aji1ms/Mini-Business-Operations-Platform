@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import StatCard from "../../components/StatCard"
-import { navItems } from '../../utils/constants';
 import Header from '../../components/Header';
 
 
