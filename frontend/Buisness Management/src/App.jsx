@@ -15,6 +15,7 @@ import { fetchStaff } from "./Redux/slices/staff/staffSlice";
 import StaffProtected from "./routes/StaffProtected";
 import AdminProtected from "./routes/AdminProtected";
 import { fetchAdmin } from "./Redux/slices/admin/adminAuthSlice";
+import Tasks from "./pages/admin/Tasks";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -46,8 +47,9 @@ const App = () => {
           <Route path="/admin" element={<Dashboard />} />
           <Route path="/admin/clients" element={<Clients />} />
           <Route path="/admin/projects" element={<Projects />} />
-          <Route path="/admin/activitys" element={<ActivityLogs />} />
+          <Route path="/admin/tasks" element={<Tasks />} />
           <Route path="/admin/members" element={<Members />} />
+          <Route path="/admin/activitys" element={<ActivityLogs />} />
         </Route>
 
         <Route path="*" element={<h1 className="text-center mt-20 text-xl">404 - Page Not Found</h1>} />

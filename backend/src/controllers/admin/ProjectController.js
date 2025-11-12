@@ -1,6 +1,6 @@
 import Project from "../../models/projectSchema.js";
 import Client from "../../models/clientSchema.js";
-import User from "../../models/userSchema.js"; 
+import User from "../../models/userSchema.js";
 
 // Create Project
 
@@ -22,7 +22,11 @@ export const addProject = async (req, res) => {
             createdBy: req.user._id,
         });
 
-        res.status(201).json({ message: "Project created successfully", project });
+        const populatedProject = await Project.findById(project._id)
+            .populate("clientId", "name company")
+            .populate("assignedDevelopers", "name email");
+
+        res.status(201).json({ message: "Project created successfully", project: populatedProject });
     } catch (error) {
         console.error("Error creating project:", error);
         res.status(500).json({ message: "Internal server error" });
@@ -33,7 +37,7 @@ export const addProject = async (req, res) => {
 
 export const getAllProjects = async (req, res) => {
     try {
-        const { clientId, status, search, page = 1, limit = 10 } = req.query;
+        const { clientId, status, search, page = 1, limit = 5 } = req.query;
 
         const query = {};
         if (clientId) query.clientId = clientId;
@@ -105,6 +109,7 @@ export const updateProject = async (req, res) => {
             timeline,
             assignedDevelopers,
             status,
+            clientId,
         } = req.body;
 
         const project = await Project.findById(id);
@@ -119,11 +124,24 @@ export const updateProject = async (req, res) => {
         if (Array.isArray(assignedDevelopers)) project.assignedDevelopers = assignedDevelopers;
         if (status) project.status = status;
 
+        if (clientId) {
+            const existingClient = await Client.findById(clientId);
+            if (!existingClient) {
+                return res.status(400).json({ message: "Invalid client ID" });
+            }
+            project.clientId = clientId;
+        }
+
         await project.save();
+
+        const updatedProject = await Project.findById(project._id)
+            .populate("clientId", "name company")
+            .populate("assignedDevelopers", "name email");
+
 
         return res.status(200).json({
             message: "Project updated successfully",
-            project,
+            project: updatedProject,
         });
     } catch (error) {
         console.error("Error updating project:", error);

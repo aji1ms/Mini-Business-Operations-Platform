@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
-import { X, FolderKanban, Building, Calendar, Users, Plus, Trash2, CheckSquare } from "lucide-react";
+import { X, FolderKanban, Building, Calendar, Users } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { addProject, updateProject, fetchProjects } from "../Redux/slices/admin/adminProjectSlice";
+import toast from "react-hot-toast";
 
-const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projectData = {} }) => {
+const ProjectModal = ({
+    isOpen,
+    onClose,
+    clients,
+    developers,
+    mode = "add",
+    projectData = {},
+}) => {
+    const dispatch = useDispatch();
+
     const [formData, setFormData] = useState({
         title: "",
         clientId: "",
@@ -9,97 +21,93 @@ const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projec
         startDate: "",
         endDate: "",
         assignedDevelopers: [],
-        status: "Planning",
+        status: "New",
     });
 
-    const [tasks, setTasks] = useState([]);
-    const [newTask, setNewTask] = useState({ title: "", description: "", assignee: "", status: "Pending" });
     const [errors, setErrors] = useState({});
-    const [showTaskForm, setShowTaskForm] = useState(false);
-
-    const developers = [
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Sarah Smith" },
-        { id: 3, name: "Mike Johnson" },
-        { id: 4, name: "Emma Wilson" },
-        { id: 5, name: "Anna Davis" },
-    ];
-
     const isView = mode === "view";
     const isEdit = mode === "edit";
     const isAdd = mode === "add";
 
-    // ✅ Pre-fill form if editing or viewing
     useEffect(() => {
         if ((isEdit || isView) && projectData) {
             setFormData({
                 title: projectData.title || "",
-                clientId: clients.find(c => c.name === projectData.client)?.id || "",
+                clientId: projectData.clientId?._id || "",
                 description: projectData.description || "",
-                startDate: projectData.startDate || "",
-                endDate: projectData.endDate || "",
-                assignedDevelopers:
-                    projectData.assignees
-                        ?.map(name => developers.find(d => d.name === name)?.id)
-                        .filter(Boolean) || [],
-                status: projectData.status || "Planning",
+                startDate: projectData.timeline?.startDate?.slice(0, 10) || "",
+                endDate: projectData.timeline?.endDate?.slice(0, 10) || "",
+                assignedDevelopers: projectData.assignedDevelopers?.map((dev) => dev._id) || [],
+                status: projectData.status || "New",
             });
-            setTasks(projectData.tasks || []);
+        } else if (isAdd) {
+            setFormData({
+                title: "",
+                clientId: "",
+                description: "",
+                startDate: "",
+                endDate: "",
+                assignedDevelopers: [],
+                status: "New",
+            });
         }
-    }, [isEdit, isView, projectData, clients]);
+    }, [isEdit, isView, projectData, isAdd]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
     const handleDeveloperToggle = (id) => {
-        setFormData(prev => ({
+        if (isView) return;
+        setFormData((prev) => ({
             ...prev,
             assignedDevelopers: prev.assignedDevelopers.includes(id)
-                ? prev.assignedDevelopers.filter(d => d !== id)
+                ? prev.assignedDevelopers.filter((d) => d !== id)
                 : [...prev.assignedDevelopers, id],
         }));
     };
 
-    const handleAddTask = () => {
-        if (!newTask.title.trim()) return alert("Task title required");
-        setTasks(prev => [...prev, { id: Date.now(), ...newTask }]);
-        setNewTask({ title: "", description: "", assignee: "", status: "Pending" });
-        setShowTaskForm(false);
-    };
-
-    const handleRemoveTask = (id) => setTasks(prev => prev.filter(t => t.id !== id));
-
+    // Validate form
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.title.trim()) newErrors.title = "Project name is required";
+        if (!formData.title.trim()) newErrors.title = "Project title is required";
         if (!formData.clientId) newErrors.clientId = "Please select a client";
+        if (!formData.description.trim()) newErrors.description = "Description is required";
         if (!formData.startDate) newErrors.startDate = "Start date required";
         if (!formData.endDate) newErrors.endDate = "End date required";
-        if (formData.startDate > formData.endDate) newErrors.endDate = "End date must be after start date";
-        if (!formData.description.trim()) newErrors.description = "Description required";
-        if (formData.assignedDevelopers.length === 0) newErrors.assignedDevelopers = "Assign at least one developer";
+        if (formData.startDate && formData.endDate && formData.startDate > formData.endDate)
+            newErrors.endDate = "End date must be after start date";
+        if (formData.assignedDevelopers.length === 0)
+            newErrors.assignedDevelopers = "Assign at least one developer";
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        const selectedClient = clients.find(c => c.id === parseInt(formData.clientId));
         const projectPayload = {
-            ...formData,
-            id: projectData?.id || Date.now(),
-            client: selectedClient?.name || "",
-            tasks,
-            progress: projectData.progress || 0,
-            assignees: formData.assignedDevelopers.map(id => developers.find(d => d.id === id)?.name),
+            clientId: formData.clientId,
+            title: formData.title,
+            description: formData.description,
+            timeline: { startDate: formData.startDate, endDate: formData.endDate },
+            assignedDevelopers: formData.assignedDevelopers,
+            status: formData.status,
         };
 
-        onSubmit(projectPayload);
+        if (isEdit) {
+            await dispatch(updateProject({ id: projectData._id, projectData: projectPayload }));
+            toast.success("project updated!", { duration: 2000 })
+        } else {
+            await dispatch(addProject(projectPayload));
+            toast.success("project created!", { duration: 2000 })
+        }
+
+        dispatch(fetchProjects());
         onClose();
     };
 
@@ -113,13 +121,11 @@ const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projec
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            {isAdd && "Create New Project"}
-                            {isEdit && "Edit Project"}
-                            {isView && "Project Details"}
-                        </h2>
-                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                        {isAdd && "Create New Project"}
+                        {isEdit && "Edit Project"}
+                        {isView && "Project Details"}
+                    </h2>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition">
                         <X size={24} className="text-gray-500" />
                     </button>
@@ -134,8 +140,11 @@ const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projec
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Title */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Project Title</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Project Title <span className="text-red-500">*</span>
+                                </label>
                                 <input
                                     name="title"
                                     value={formData.title}
@@ -144,25 +153,33 @@ const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projec
                                     className={`w-full px-4 py-3 border rounded-lg outline-none ${isView ? "bg-gray-100 cursor-not-allowed" : ""
                                         } ${errors.title ? "border-red-500" : "border-gray-300"}`}
                                 />
+                                {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title}</p>}
                             </div>
 
+                            {/* Client */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Client</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Client <span className="text-red-500">*</span>
+                                </label>
                                 <select
                                     name="clientId"
                                     value={formData.clientId}
                                     onChange={handleChange}
                                     disabled={isView}
-                                    className={`w-full px-4 py-3 border rounded-lg ${isView ? "bg-gray-100 cursor-not-allowed" : ""
-                                        } ${errors.clientId ? "border-red-500" : "border-gray-300"}`}
+                                    className={`w-full px-4 py-3 border rounded-lg ${errors.clientId ? "border-red-500" : "border-gray-300"
+                                        }`}
                                 >
                                     <option value="">Select a client</option>
-                                    {clients.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    {clients.map((c) => (
+                                        <option key={c._id} value={c._id}>
+                                            {c.name}
+                                        </option>
                                     ))}
                                 </select>
+                                {errors.clientId && <p className="text-sm text-red-500 mt-1">{errors.clientId}</p>}
                             </div>
 
+                            {/* Status */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                                 <select
@@ -172,13 +189,15 @@ const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projec
                                     disabled={isView}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                                 >
-                                    <option>Planning</option>
+                                    <option>New</option>
                                     <option>In Progress</option>
                                     <option>On Hold</option>
                                     <option>Completed</option>
+                                    <option>Closed</option>
                                 </select>
                             </div>
 
+                            {/* Dates */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                                 <input
@@ -189,8 +208,8 @@ const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projec
                                     disabled={isView}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                                 />
+                                {errors.startDate && <p className="text-sm text-red-500 mt-1">{errors.startDate}</p>}
                             </div>
-
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                                 <input
@@ -201,37 +220,48 @@ const ProjectModal = ({ isOpen, onClose, onSubmit, clients, mode = "add", projec
                                     disabled={isView}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                                 />
+                                {errors.endDate && <p className="text-sm text-red-500 mt-1">{errors.endDate}</p>}
                             </div>
 
+                            {/* Description */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Description <span className="text-red-500">*</span>
+                                </label>
                                 <textarea
                                     name="description"
                                     value={formData.description}
                                     onChange={handleChange}
                                     disabled={isView}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none"
                                     rows={3}
+                                    className={`w-full px-4 py-3 border rounded-lg resize-none ${errors.description ? "border-red-500" : "border-gray-300"
+                                        }`}
                                 />
+                                {errors.description && (
+                                    <p className="text-sm text-red-500 mt-1">{errors.description}</p>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Developers Section */}
+                    {/* Developers */}
                     <div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Users size={20} className="text-blue-600" /> Assigned Developers
                         </h3>
+                        {errors.assignedDevelopers && (
+                            <p className="text-sm text-red-500 mb-2">{errors.assignedDevelopers}</p>
+                        )}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                            {developers.map(dev => (
+                            {developers.map((dev) => (
                                 <button
-                                    key={dev.id}
+                                    key={dev._id}
                                     type="button"
                                     disabled={isView}
-                                    onClick={() => handleDeveloperToggle(dev.id)}
-                                    className={`p-3 rounded-lg border-2 transition ${formData.assignedDevelopers.includes(dev.id)
-                                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                                            : "border-gray-300"
+                                    onClick={() => handleDeveloperToggle(dev._id)}
+                                    className={`p-3 rounded-lg border-2 transition ${formData.assignedDevelopers.includes(dev._id)
+                                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                                        : "border-gray-300"
                                         } ${isView ? "cursor-not-allowed opacity-70" : ""}`}
                                 >
                                     <div className="flex flex-col items-center gap-2">

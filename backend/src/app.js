@@ -7,6 +7,7 @@ import staffRoute from "./routes/staffRoutes.js";
 import adminRoute from "./routes/adminRoutes.js";
 import projectRoute from "./routes/projectRoutes.js";
 import clientRoute from "./routes/clientRoutes.js";
+import taskRoute from "./routes/taskRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -30,9 +31,10 @@ connectDb();
 
 
 app.use("/api/admin", adminRoute);
-app.use("/api/admin/project", projectRoute);
-app.use("/api/admin/client", clientRoute);
 app.use("/api/staff", staffRoute);
+app.use("/api/admin/project", projectRoute);
+app.use("/api/admin/task", taskRoute);
+app.use("/api/admin/client", clientRoute);
 
 const PORT = process.env.PORT || 3008;
 app.listen(PORT, () => console.log('Server Running....'));              
