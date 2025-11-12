@@ -6,7 +6,7 @@ import { clearJWT, generateJWT } from "../../utils/jwtUtils.js";
 export const registerUser = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
-        if (!name || !email || !password || !role) {
+        if (!name || !email || !password) {
             res.status(400).json({ message: "Missing credentials!" });
             return;
         }

@@ -34,7 +34,7 @@ export const addClient = async (req, res) => {
 
 export const getAllClients = async (req, res) => {
     try {
-        const { search, status, page = 1, limit = 1 } = req.query;
+        const { search, status, page = 1, limit = 6 } = req.query;
         const query = {};
 
         if (search) {

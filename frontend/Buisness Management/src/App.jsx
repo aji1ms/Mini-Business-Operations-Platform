@@ -1,23 +1,59 @@
-import { BrowserRouter, Route, Routes } from "react-router";
-import Dashboard from "./pages/Dashboard";
-import Projects from "./pages/Projects";
-import ActivityLogs from "./pages/ActivityLogs";
-import Clients from "./pages/Clients";
-import ProjectModal from "./components/ProjectModal";
-import Members from "./pages/Members";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import Register from "./pages/auth/Register";
+import Login from "./pages/auth/Login";
+import AdminLogin from "./pages/auth/AdminLogin";
+import StaffDashboard from "./pages/staff/StaffDashboard";
+import Dashboard from "./pages/admin/Dashboard";
+import Projects from "./pages/admin/Projects";
+import Clients from "./pages/admin/Clients";
+import ActivityLogs from "./pages/admin/ActivityLogs";
+import Members from "./pages/admin/Members";
+import { fetchStaff } from "./Redux/slices/staff/staffSlice";
+import StaffProtected from "./routes/StaffProtected";
+import AdminProtected from "./routes/AdminProtected";
+import { fetchAdmin } from "./Redux/slices/admin/adminAuthSlice";
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchStaff())
+  }, [dispatch])
+
+  useEffect(() => {
+    dispatch(fetchAdmin())
+  }, [dispatch])
+
   return (
     <BrowserRouter>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/clients" element={<Clients />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/activitys" element={<ActivityLogs />} />
-        <Route path="/members" element={<Members />} />
+        {/* AUTH ROUTES */}
+        <Route path="/signup" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+
+        <Route element={<StaffProtected />}>
+          <Route path="/" element={<StaffDashboard />} />
+        </Route>
+
+        {/* ADMIN ROUTES */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route element={<AdminProtected />}>
+          <Route path="/admin" element={<Dashboard />} />
+          <Route path="/admin/clients" element={<Clients />} />
+          <Route path="/admin/projects" element={<Projects />} />
+          <Route path="/admin/activitys" element={<ActivityLogs />} />
+          <Route path="/admin/members" element={<Members />} />
+        </Route>
+
+        <Route path="*" element={<h1 className="text-center mt-20 text-xl">404 - Page Not Found</h1>} />
       </Routes>
     </BrowserRouter>
   )
 }
 
-export default App
+export default App;

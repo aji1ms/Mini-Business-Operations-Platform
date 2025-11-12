@@ -1,72 +1,61 @@
 import { useState, useEffect } from 'react';
-import { X, User, Mail, Phone, Lock, Shield, Building2, Calendar } from 'lucide-react';
+import { X, User, Mail, Lock, Shield, } from 'lucide-react';
 
-const MemberModal = ({ isOpen, onClose, onSubmit, mode = "add", memberData = null }) => {
+const MemberModal = ({ isOpen, onClose, onSubmit, mode = "add", memberData = null, loading = false }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        phone: '',
         password: '',
         confirmPassword: '',
         role: 'Staff',
-        department: '',
         status: 'Active',
     });
 
+    
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
-
+    
     useEffect(() => {
         if (memberData && (mode === 'edit' || mode === 'view')) {
             setFormData({
                 ...memberData,
-                password: '',
-                confirmPassword: ''
             });
         } else {
             setFormData({
                 name: '',
                 email: '',
-                phone: '',
                 password: '',
                 confirmPassword: '',
                 role: 'Staff',
-                department: '',
                 status: 'Active',
             });
         }
     }, [memberData, mode, isOpen]);
-
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-
+        
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
-
+    
     const validateForm = () => {
         const newErrors = {};
-
+        
         if (!formData.name.trim()) {
             newErrors.name = 'Name is required';
         } else if (formData.name.trim().length < 3) {
             newErrors.name = 'Name must be at least 3 characters';
         }
-
+        
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Email is invalid';
         }
-
-        if (!formData.phone.trim()) {
-            newErrors.phone = 'Phone number is required';
-        } else if (!/^[\d\s\-\+\(\)]+$/.test(formData.phone)) {
-            newErrors.phone = 'Phone number is invalid';
-        }
-
+        
         if (mode === 'add') {
             if (!formData.password) {
                 newErrors.password = 'Password is required';
@@ -75,54 +64,42 @@ const MemberModal = ({ isOpen, onClose, onSubmit, mode = "add", memberData = nul
             } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
                 newErrors.password = 'Password must contain uppercase, lowercase, and number';
             }
-
+            
             if (!formData.confirmPassword) {
                 newErrors.confirmPassword = 'Please confirm your password';
             } else if (formData.password !== formData.confirmPassword) {
                 newErrors.confirmPassword = 'Passwords do not match';
             }
         }
-
-        if (mode === 'edit' && formData.password) {
-            if (formData.password.length < 6) {
-                newErrors.password = 'Password must be at least 6 characters';
-            } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-                newErrors.password = 'Password must contain uppercase, lowercase, and number';
-            }
-
-            if (formData.password !== formData.confirmPassword) {
-                newErrors.confirmPassword = 'Passwords do not match';
-            }
-        }
-
-        if (!formData.department.trim()) {
-            newErrors.department = 'Department is required';
-        }
-
+        
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
+               
     const handleSubmit = (e) => {
         e.preventDefault();
-
+        
         if (mode === 'view') {
             onClose();
             return;
         }
-
+        
         if (validateForm()) {
             const submitData = {
-                ...formData,
-                projectsAssigned: memberData?.projectsAssigned || 0
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                role: formData.role.toLowerCase(),
+                isActive: formData.status === 'Active'
             };
-
-            delete submitData.confirmPassword;
-
-            if (mode === 'edit' && !submitData.password) {
-                delete submitData.password;
+            
+            if (formData.password) {
+                submitData.password = formData.password;
             }
 
+            if (mode === 'edit' && memberData) {
+                submitData.id = memberData.id;
+            }
+            
             onSubmit(submitData);
             handleClose();
         }
@@ -132,11 +109,9 @@ const MemberModal = ({ isOpen, onClose, onSubmit, mode = "add", memberData = nul
         setFormData({
             name: '',
             email: '',
-            phone: '',
             password: '',
             confirmPassword: '',
             role: 'Staff',
-            department: '',
             status: 'Active',
         });
         setErrors({});
@@ -234,33 +209,8 @@ const MemberModal = ({ isOpen, onClose, onSubmit, mode = "add", memberData = nul
                                 )}
                             </div>
 
-                            {/* Phone */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Phone Number <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        disabled={isViewMode}
-                                        placeholder="+1 234 567 8900"
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${errors.phone ? 'border-red-500' : 'border-gray-300'
-                                            } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
-                                    />
-                                </div>
-                                {errors.phone && (
-                                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                                        <span>⚠</span> {errors.phone}
-                                    </p>
-                                )}
-                            </div>
-
                             {/* Password*/}
-                            {!isViewMode && (
+                            {isAddMode && (
                                 <>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -354,35 +304,10 @@ const MemberModal = ({ isOpen, onClose, onSubmit, mode = "add", memberData = nul
                                     <option value="Inactive">Inactive</option>
                                 </select>
                             </div>
-
-                            {/* Department */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Department <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="text"
-                                        name="department"
-                                        value={formData.department}
-                                        onChange={handleChange}
-                                        disabled={isViewMode}
-                                        placeholder="e.g., Engineering, Design"
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${errors.department ? 'border-red-500' : 'border-gray-300'
-                                            } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
-                                    />
-                                </div>
-                                {errors.department && (
-                                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                                        <span>⚠</span> {errors.department}
-                                    </p>
-                                )}
-                            </div>
                         </div>
 
                         {/* Show Password Toggle */}
-                        {!isViewMode && (
+                        {isAddMode && (
                             <div className="mt-6">
                                 <label className="flex items-center gap-2 cursor-pointer select-none">
                                     <input

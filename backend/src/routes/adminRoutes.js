@@ -1,21 +1,24 @@
 import express from "express";
 import authenticateUser from "../middlewares/authMiddleware.js";
 import { loginAdmin, getAdminInfo, logoutAdmin } from "../controllers/admin/adminController.js";
-import { getAllStaff, getStaffById, updateStaff, deleteStaff } from "../controllers/admin/staffController.js"
+import { getAllStaff, getStaffById, updateStaff, deleteStaff, createStaff } from "../controllers/admin/staffController.js"
 
 const router = express.Router();
+
+router.use(authenticateUser(["admin"], "adminToken"));
 
 // Login Management
 
 router.post("/login", loginAdmin);
-router.get("/getInfo", authenticateUser(["admin"], "adminToken"), getAdminInfo)
-router.post("/logout", authenticateUser(["admin"], "adminToken"), logoutAdmin)
+router.get("/getInfo", getAdminInfo)
+router.post("/logout", logoutAdmin)
 
 // Staff Management
 
-router.get("/staff", authenticateUser(["admin"], "adminToken"), getAllStaff);
-router.get("/staff/:id", authenticateUser(["admin"], "adminToken"), getStaffById);
-router.put("/staff/edit/:id", authenticateUser(["admin"], "adminToken"), updateStaff);
-router.delete("/staff/delete/:id", authenticateUser(["admin"], "adminToken"), deleteStaff);
+router.get("/staff", getAllStaff);
+router.post("/staff/add", createStaff);
+router.get("/staff/:id", getStaffById);
+router.put("/staff/edit/:id", updateStaff);
+router.delete("/staff/delete/:id", deleteStaff);
 
 export default router;

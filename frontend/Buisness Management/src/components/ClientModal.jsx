@@ -1,24 +1,40 @@
-import { useEffect, useState } from 'react';
-import { X, User, Mail, Phone, Building, Calendar } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { X, User, Mail, Phone, Building2, MapPin } from "lucide-react";
 
-const ClientModal = ({ isOpen, onClose, onSubmit, mode = "add", clientData = {} }) => {
+const ClientModal = ({ isOpen, onClose, onSubmit, mode = "add", clientData = null, loading = false }) => {
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        status: 'New',
-        company: '',
-        address: '',
-        notes: ''
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        address: "",
+        status: "New",
     });
 
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        if (mode !== "add" && clientData) {
-            setFormData(clientData);
+        if ((mode === "edit" || mode === "view") && clientData) {
+            setFormData({
+                name: clientData.name || "",
+                email: clientData.email || "",
+                phone: clientData.phone || "",
+                company: clientData.company || "",
+                address: clientData.address || "",
+                status: clientData.status || "New",
+            });
+        } else {
+            setFormData({
+                name: "",
+                email: "",
+                phone: "",
+                company: "",
+                address: "",
+                status: "New",
+            });
         }
-    }, [mode, clientData]);
+        setErrors({});
+    }, [mode, clientData, isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -28,50 +44,41 @@ const ClientModal = ({ isOpen, onClose, onSubmit, mode = "add", clientData = {} 
 
     const validateForm = () => {
         const newErrors = {};
-
-        if (!formData.name.trim()) {
-            newErrors.name = 'Client name is required';
-        }
-
+        if (!formData.name.trim()) newErrors.name = "Client name is required";
         if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
+            newErrors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email is invalid';
+            newErrors.email = "Invalid email format";
         }
-
         if (!formData.phone.trim()) {
-            newErrors.phone = 'Phone number is required';
+            newErrors.phone = "Phone number is required";
         } else if (!/^[\d\s\-\+\(\)]+$/.test(formData.phone)) {
-            newErrors.phone = 'Phone number is invalid';
+            newErrors.phone = "Invalid phone number";
         }
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (mode === "view") return onClose();
 
         if (validateForm()) {
-            onSubmit({
-                ...formData,
-                id: Date.now(),
-                projects: 0,
-                createdAt: new Date().toISOString().split('T')[0]
-            });
+            const payload = { ...formData };
+            if (mode === "edit" && clientData?._id) payload._id = clientData._id;
+            onSubmit(payload);
             handleClose();
         }
     };
 
     const handleClose = () => {
         setFormData({
-            name: '',
-            email: '',
-            phone: '',
-            status: 'New',
-            company: '',
-            address: '',
-            notes: ''
+            name: "",
+            email: "",
+            phone: "",
+            company: "",
+            address: "",
+            status: "New",
         });
         setErrors({});
         onClose();
@@ -79,201 +86,185 @@ const ClientModal = ({ isOpen, onClose, onSubmit, mode = "add", clientData = {} 
 
     if (!isOpen) return null;
 
-    const isView = mode === "view";
-    const isEdit = mode === "edit";
-    const isAdd = mode === "add";
+    const isViewMode = mode === "view";
+    const isEditMode = mode === "edit";
+    const isAddMode = mode === "add";
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div
-                className="fixed inset-0 bg-opacity-50 transition-opacity bg-black/50 backdrop-blur-2xl"
-                onClick={handleClose}
-            />
-
-            {/* Modal */}
-            <div className="flex min-h-screen items-center justify-center p-4">
-                <div
-                    className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+                    <div>
                         <h2 className="text-2xl font-bold text-gray-900">
-                            {isAdd && "Add New Client"}
-                            {isEdit && "Edit Client"}
-                            {isView && "Client Details"}
+                            {isAddMode && "Add New Client"}
+                            {isEditMode && "Edit Client"}
+                            {isViewMode && "Client Details"}
                         </h2>
-                        <button
-                            onClick={onClose}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition"
-                        >
-                            <X size={24} className="text-gray-500" />
-                        </button>
+                        <p className="text-sm text-gray-500">
+                            {isAddMode && "Fill out details to add a new client."}
+                            {isEditMode && "Update the client’s details below."}
+                            {isViewMode && "View client information."}
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleClose}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition"
+                    >
+                        <X size={22} className="text-gray-500" />
+                    </button>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                    {/* Name */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Client Name <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                disabled={isViewMode}
+                                placeholder="Enter client name"
+                                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${errors.name ? "border-red-500" : "border-gray-300"} ${isViewMode ? "bg-gray-50 cursor-not-allowed" : ""
+                                    }`}
+                            />
+                        </div>
+                        {errors.name && (
+                            <p className="text-sm text-red-500 mt-1">{errors.name}</p>
+                        )}
                     </div>
 
-                    {/* Form */}
-                    <form onSubmit={handleSubmit} className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Client Name */}
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Client Name <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        disabled={isView}
-                                        placeholder="Enter client name"
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${errors.name ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                    />
-                                </div>
-                                {errors.name && (
-                                    <p className="mt-1 text-sm text-red-500">{errors.name}</p>
-                                )}
-                            </div>
-
-                            {/* Email */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email Address <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        disabled={isView}
-                                        placeholder="client@example.com"
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${errors.email ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                    />
-                                </div>
-                                {errors.email && (
-                                    <p className="mt-1 text-sm text-red-500">{errors.email}</p>
-                                )}
-                            </div>
-
-                            {/* Phone */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Phone Number <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        disabled={isView}
-                                        placeholder="+1 234 567 8900"
-                                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${errors.phone ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                    />
-                                </div>
-                                {errors.phone && (
-                                    <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
-                                )}
-                            </div>
-
-                            {/* Company Name */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Company Name
-                                </label>
-                                <div className="relative">
-                                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="text"
-                                        name="company"
-                                        value={formData.company}
-                                        onChange={handleChange}
-                                        disabled={isView}
-                                        placeholder="Company name (optional)"
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Status */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Status <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    name="status"
-                                    value={formData.status}
-                                    onChange={handleChange}
-                                    disabled={isView}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                                >
-                                    <option value="New">New</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Paused">Paused</option>
-                                    <option value="Closed">Closed</option>
-                                </select>
-                            </div>
-
-                            {/* Address */}
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Address
-                                </label>
-                                <input
-                                    type="text"
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                    disabled={isView}
-                                    placeholder="Enter client address (optional)"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                                />
-                            </div>
-
-                            {/* Notes */}
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Notes
-                                </label>
-                                <textarea
-                                    name="notes"
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                    disabled={isView}
-                                    placeholder="Add any additional notes about the client..."
-                                    rows="4"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
-                                />
-                            </div>
+                    {/* Email */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                disabled={isViewMode}
+                                placeholder="client@example.com"
+                                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${errors.email ? "border-red-500" : "border-gray-300"} ${isViewMode ? "bg-gray-50 cursor-not-allowed" : ""
+                                    }`}
+                            />
                         </div>
+                        {errors.email && (
+                            <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+                        )}
+                    </div>
 
-                        {/* Footer Buttons */}
-                        <div className="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+                    {/* Phone */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                disabled={isViewMode}
+                                placeholder="+91 98765 43210"
+                                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${errors.phone ? "border-red-500" : "border-gray-300"} ${isViewMode ? "bg-gray-50 cursor-not-allowed" : ""
+                                    }`}
+                            />
+                        </div>
+                        {errors.phone && (
+                            <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
+                        )}
+                    </div>
+
+                    {/* Company */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Company Name
+                        </label>
+                        <div className="relative">
+                            <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                name="company"
+                                value={formData.company}
+                                onChange={handleChange}
+                                disabled={isViewMode}
+                                placeholder="Enter company name"
+                                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${isViewMode ? "bg-gray-50 cursor-not-allowed" : ""}`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Address */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Address
+                        </label>
+                        <div className="relative">
+                            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                disabled={isViewMode}
+                                placeholder="Enter address"
+                                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${isViewMode ? "bg-gray-50 cursor-not-allowed" : ""}`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Status */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Status
+                        </label>
+                        <select
+                            name="status"
+                            value={formData.status}
+                            onChange={handleChange}
+                            disabled={isViewMode}
+                            className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${isViewMode ? "bg-gray-50 cursor-not-allowed" : ""}`}
+                        >
+                            <option value="New">New</option>
+                            <option value="Active">Active</option>
+                            <option value="Paused">Paused</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+                        <button
+                            type="button"
+                            onClick={handleClose}
+                            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                        >
+                            {isViewMode ? "Close" : "Cancel"}
+                        </button>
+                        {!isViewMode && (
                             <button
-                                type="button"
-                                onClick={handleClose}
-                                className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+                                type="submit"
+                                disabled={loading}
+                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                             >
-                                {isView ? "Close" : "Cancel"}
+                                {isEditMode ? "Save Changes" : "Add Client"}
                             </button>
-                            {!isView && (
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                                >
-                                    {isEdit ? "Save Changes" : "Add Client"}
-                                </button>
-                            )}
-                        </div>
-                    </form>
-                </div>
+                        )}
+                    </div>
+                </form>
             </div>
         </div>
     );

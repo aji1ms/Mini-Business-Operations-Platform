@@ -1,8 +1,8 @@
 import { Calendar, Edit, Eye, Filter, Plus, Search, Trash2 } from "lucide-react";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
 import { useState } from "react";
-import ProjectModal from "../components/ProjectModal";
+import ProjectModal from "../../components/ProjectModal";
 
 const projects = [
     { id: 1, title: 'E-commerce Platform', client: 'Acme Corp', status: 'In Progress', progress: 65, deadline: '2024-12-15', assignees: ['John', 'Sarah'], tasks: 24 },

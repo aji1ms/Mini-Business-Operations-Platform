@@ -5,10 +5,10 @@ import {
     CheckCircle,
     AlertCircle,
 } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
-import StatCard from "../components/StatCard"
-import { navItems } from '../utils/constants';
-import Header from '../components/Header';
+import Sidebar from '../../components/Sidebar';
+import StatCard from "../../components/StatCard"
+import { navItems } from '../../utils/constants';
+import Header from '../../components/Header';
 
 
 // Main App Component

@@ -4,7 +4,7 @@ import User from "../../models/userSchema.js";
 
 export const getAllStaff = async (req, res) => {
     try {
-        const { search, role, status, page = 1, limit = 2 } = req.query;
+        const { search, role, status, page = 1, limit = 6 } = req.query;
 
         const query = {};
 
@@ -26,17 +26,47 @@ export const getAllStaff = async (req, res) => {
         const limitNumber = parseInt(limit, 10) || 10;
         const skip = (pageNumber - 1) * limitNumber;
 
-        const [totalUsers, totalAdmins, totalStaff, totalInactive, totalFiltered, users] = await Promise.all([
+        const [result] = await User.aggregate([
+            { $match: query },
+            {
+                $lookup: {
+                    from: "projects",
+                    localField: "_id",
+                    foreignField: "assignedDevelopers",
+                    as: "projects",
+                },
+            },
+            {
+                $addFields: {
+                    projectCount: { $size: "$projects" },
+                },
+            },
+            {
+                $project: {
+                    password: 0,
+                    projects: 0,
+                },
+            },
+            {
+                $facet: {
+                    paginatedData: [
+                        { $sort: { createdAt: -1 } },
+                        { $skip: skip },
+                        { $limit: limitNumber },
+                    ],
+                    totalFiltered: [{ $count: "count" }],
+                },
+            },
+        ]);
+
+        const users = result.paginatedData;
+        const totalFiltered = result.totalFiltered[0]?.count || 0;
+
+        const [totalUsers, totalAdmins, totalStaff, totalInactive] = await Promise.all([
             User.countDocuments(),
             User.countDocuments({ role: "admin" }),
             User.countDocuments({ role: "staff" }),
             User.countDocuments({ isActive: false }),
-            User.countDocuments(query),
-            User.find(query)
-                .select("-password")
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limitNumber),
         ]);
 
         return res.status(200).json({
@@ -57,6 +87,47 @@ export const getAllStaff = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching users:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+// Add Staff
+
+export const createStaff = async (req, res) => {
+    try {
+        const { name, email, password, role } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "Name, email and password are required" });
+        }
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "Email already exists" });
+        }
+
+        const newStaff = new User({
+            name,
+            email,
+            password,
+            role: role || 'staff',
+            isActive: true
+        });
+
+        await newStaff.save();
+
+        return res.status(201).json({
+            message: "Staff member created successfully",
+            staff: {
+                id: newStaff._id,
+                name: newStaff.name,
+                email: newStaff.email,
+                role: newStaff.role,
+                isActive: newStaff.isActive
+            }
+        });
+    } catch (error) {
+        console.error("Error creating staff:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -117,7 +188,7 @@ export const deleteStaff = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const staff = await User.findOneAndDelete({ _id: id});
+        const staff = await User.findOneAndDelete({ _id: id });
         if (!staff) {
             return res.status(404).json({ message: "Staff not found" });
         }

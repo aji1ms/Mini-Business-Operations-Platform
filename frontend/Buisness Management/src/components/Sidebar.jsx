@@ -2,11 +2,25 @@ import { useState, useEffect } from "react";
 import { navItems } from "../utils/constants";
 import { LogOut, Menu, X, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutAdmin } from "../Redux/slices/admin/adminAuthSlice";
+import toast from "react-hot-toast";
 
 const Sidebar = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useDispatch();
+
+    const handleLogout = async () => {
+        try {
+            await dispatch(logoutAdmin()).unwrap();
+            toast.success("Logged out successfully!");
+            navigate("/admin/login");
+        } catch {
+            toast.error("Logout failed!");
+        }
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -88,7 +102,9 @@ const Sidebar = () => {
                         </div>
                     </div>
 
-                    <button className="w-full mt-3 flex items-center gap-2 px-4 py-2 text-red-400 hover:bg-slate-800 rounded-lg transition">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full mt-3 flex items-center gap-2 px-4 py-2 text-red-400 hover:bg-slate-800 rounded-lg transition">
                         <LogOut size={18} />
                         <span>Logout</span>
                     </button>
