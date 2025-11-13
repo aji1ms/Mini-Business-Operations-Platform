@@ -21,6 +21,7 @@ const app = express();
 
 const corsOptions = {
     origin: [
+        'https://mini-business-operations-platform.vercel.app/login',
         'http://localhost:5173',
     ],
     credentials: true,
