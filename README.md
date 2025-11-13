@@ -293,7 +293,7 @@ Frontend will run on `http://localhost:5173`
 To access the admin dashboard, use the credentials below:
 
 🔗 **Login Endpoint:** `/admin/login`  
-🌐 **Full URL:** https://m-bop-backend.onrender.com/admin/login
+🌐 **Full URL:** https://mini-business-operations-platform.vercel.app/admin/login
 
 - **Email:** john@gmail.com  
 - **Password:** john@123
