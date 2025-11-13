@@ -1,5 +1,4 @@
 import { X, Users, Calendar, CheckCircle2, Building, FileText } from "lucide-react";
-import { useState } from "react";
 
 const StaffProjectModal = ({ mode, project, onClose, onUpdateStatus }) => {
     const [status, setStatus] = useState(project?.status || "");
