@@ -108,6 +108,21 @@ const ProjectModal = ({
         }
 
         dispatch(fetchProjects());
+        handleClose()
+        onClose();
+    };
+
+    const handleClose = () => {
+        setFormData({
+            title: "",
+            clientId: "",
+            description: "",
+            startDate: "",
+            endDate: "",
+            assignedDevelopers: [],
+            status: "New",
+        });
+        setErrors({});
         onClose();
     };
 

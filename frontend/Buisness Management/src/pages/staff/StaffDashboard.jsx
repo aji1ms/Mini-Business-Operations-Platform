@@ -15,15 +15,7 @@ const StaffDashboard = () => {
 
     useEffect(() => {
         dispatch(fetchStaffDashboardData());
-    }, [dispatch]);
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen bg-gray-50">
-                <Loader className="animate-spin text-blue-600" size={40} />
-            </div>
-        );
-    }
+    }, [dispatch])
 
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">

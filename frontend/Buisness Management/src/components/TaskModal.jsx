@@ -98,6 +98,20 @@ const TaskModal = ({ isOpen, onClose, mode = "add", taskData = null, projects = 
         };
 
         onSubmit(payload);
+        handleClose()
+        onClose();
+    };
+
+    const handleClose = () => {
+        setFormData({
+            projectId: "",
+            title: "",
+            description: "",
+            assignedTo: "",
+            dueDate: "",
+            status: "Pending",
+        });
+        setErrors({});
         onClose();
     };
 

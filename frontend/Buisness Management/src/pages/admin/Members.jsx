@@ -271,12 +271,6 @@ const Members = () => {
                     </button>
                 </div>
 
-                {searchQuery !== debouncedSearch && (
-                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center">
-                        <p className="text-blue-700 text-sm">Searching for "{searchQuery}"...</p>
-                    </div>
-                )}
-
                 {/* Members Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                     {formattedMembers.map(member => (

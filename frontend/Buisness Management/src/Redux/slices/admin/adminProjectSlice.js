@@ -10,7 +10,7 @@ const initialState = {
     pagination: {
         page: 1,
         totalPages: 0,
-        limit: 6,
+        limit: 5,
     },
     loading: false,
     error: null,
@@ -27,7 +27,7 @@ export const fetchProjects = createAsyncThunk(
     "projects/fetchProjects",
     async (filters = {}, { rejectWithValue }) => {
         try {
-            const { search, status, clientId, page = 1, limit = 6 } = filters;
+            const { search, status, clientId, page = 1, limit = 5 } = filters;
 
             const params = new URLSearchParams();
             if (search) params.append("search", search);

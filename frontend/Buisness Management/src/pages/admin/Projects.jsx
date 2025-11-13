@@ -22,7 +22,6 @@ const Projects = () => {
     const { clients } = useSelector((state) => state.clients);
     const { members } = useSelector((state) => state.staffs);
 
-
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState("add");
     const [selectedProject, setSelectedProject] = useState(null);
@@ -58,7 +57,7 @@ const Projects = () => {
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">
             <Sidebar />
-            <div className="flex-1 space-y-6 mx-6">
+            <div className="flex-1 overflow-y-auto space-y-6 mx-6">
                 <div className="flex items-center justify-between mt-4 mb-6">
                     <Header title="Projects" description="Track and manage ongoing projects" />
 
