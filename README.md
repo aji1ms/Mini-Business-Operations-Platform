@@ -288,6 +288,16 @@ npm run dev
 
 Frontend will run on `http://localhost:5173`
 
+## 🔐 Default Admin Account
+
+To access the admin dashboard, use the credentials below:
+
+🔗 **Login Endpoint:** `/admin/login`  
+🌐 **Full URL:** https://m-bop-backend.onrender.com/admin/login
+
+- **Email:** john@gmail.com  
+- **Password:** john@123
+
 ---
 ## 📄 Documentation
 
