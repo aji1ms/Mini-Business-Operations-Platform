@@ -97,7 +97,7 @@ const StaffSidebar = () => {
                             <User size={20} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium">Admin</p>
+                            <p className="text-sm font-medium">Staff</p>
                             <p className="text-xs text-slate-400">Staff User</p>
                         </div>
                     </div>

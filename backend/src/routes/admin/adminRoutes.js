@@ -1,7 +1,7 @@
 import express from "express";
-import authenticateUser from "../middlewares/authMiddleware.js";
-import { loginAdmin, getAdminInfo, logoutAdmin } from "../controllers/admin/adminController.js";
-import { getAllStaff, getStaffById, updateStaff, deleteStaff, createStaff } from "../controllers/admin/staffController.js"
+import authenticateUser from "../../middlewares/authMiddleware.js";
+import { loginAdmin, getAdminInfo, logoutAdmin } from "../../controllers/admin/adminController.js";
+import { getAllStaff, getStaffById, updateStaff, deleteStaff, createStaff } from "../../controllers/admin/staffController.js"
 
 const router = express.Router();
 

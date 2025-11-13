@@ -1,7 +1,8 @@
 import {
     Edit, Eye, Filter, Mail, Plus, Search, Trash2, Building2, MapPin, FolderKanban,
     ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-    Phone
+    Phone,
+    Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
@@ -10,10 +11,11 @@ import ClientModal from "../../components/ClientModal";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchClients, addClient, updateClient, deleteClient, setPagination } from "../../Redux/slices/admin/adminClientSlice";
 import toast from "react-hot-toast";
+import StatCard from "../../components/StatCard";
 
 const Clients = () => {
     const dispatch = useDispatch();
-    const { clients, pagination, loading, error } = useSelector((state) => state.clients);
+    const { clients, pagination, loading, summary, error } = useSelector((state) => state.clients);
 
     const [showModal, setShowModal] = useState(false);
     const [modalMode, setModalMode] = useState("add");
@@ -126,7 +128,7 @@ const Clients = () => {
             <Sidebar />
             <div className="flex-1 overflow-auto mx-4">
                 {/* Header */}
-                <div className="flex items-center justify-between mt-4 mb-6">
+                <div className="flex items-center justify-between mt-4 mb-4">
                     <Header title={"Clients"} description={"Manage your client relationships"} />
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -138,6 +140,14 @@ const Clients = () => {
                             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-64"
                         />
                     </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <StatCard
+                        title={"Total CLients"}
+                        value={summary?.totalClients}
+                        icon={<Users className="w-6 h-6 text-yellow-600" />}
+                    />
                 </div>
 
                 {/* Filters */}

@@ -51,7 +51,6 @@ export const getMyProjects = async (req, res) => {
             projects,
         });
     } catch (error) {
-        console.error("Error fetching staff projects:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -84,7 +83,6 @@ export const getProjectById = async (req, res) => {
             tasks,
         });
     } catch (error) {
-        console.error("Error fetching project:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -133,7 +131,6 @@ export const updateProjectStatus = async (req, res) => {
             project: updatedProject,
         });
     } catch (error) {
-        console.error("Error updating project status:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

@@ -13,7 +13,7 @@ export const createActivity = async (action, performedBy, entityType, entityId, 
         await log.save();
         return log;
     } catch (error) {
-        console.error("Error creating activity log:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -28,8 +28,7 @@ export const getAllActivities = async (req, res) => {
             message: "Activities fetched successfully",
             logs,
         });
-    } catch (error) { 
-        console.error("Error fetching activities:", error);
+    } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
 };

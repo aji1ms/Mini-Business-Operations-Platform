@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Calendar, Edit, Eye, Filter, Plus, Search, Trash2 } from "lucide-react";
+import { Edit, Eye, Filter, NotepadText, Plus, Search, Trash2 } from "lucide-react";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import ProjectModal from "../../components/ProjectModal";
@@ -13,10 +13,12 @@ import {
 } from "../../Redux/slices/admin/adminProjectSlice";
 import { fetchClients } from "../../Redux/slices/admin/adminClientSlice";
 import { fetchMembers } from "../../Redux/slices/admin/adminStaffSlice";
+import StatCard from "../../components/StatCard";
+
 
 const Projects = () => {
     const dispatch = useDispatch();
-    const { projects, filters, pagination, loading } = useSelector((state) => state.projects);
+    const { projects, filters, pagination, loading, summary } = useSelector((state) => state.projects);
     const { clients } = useSelector((state) => state.clients);
     const { members } = useSelector((state) => state.staffs);
 
@@ -71,6 +73,14 @@ const Projects = () => {
                             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-64"
                         />
                     </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <StatCard
+                        title={"Total Projects"}
+                        value={summary?.totalProjects}
+                        icon={<NotepadText className="w-6 h-6 text-yellow-600" />}
+                    />
                 </div>
 
                 {/* Filter Bar */}

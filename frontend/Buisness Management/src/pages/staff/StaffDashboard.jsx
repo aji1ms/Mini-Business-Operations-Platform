@@ -1,112 +1,136 @@
-import {
-    Users,
-    FolderKanban,
-    Activity,
-    CheckCircle,
-    AlertCircle,
-} from 'lucide-react';
-import StatCard from "../../components/StatCard"
-import Header from '../../components/Header';
-import StaffSidebar from '../../components/StaffSidebar';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStaffDashboardData } from "../../Redux/slices/staff/dashboardSlice";
+import StaffSidebar from "../../components/StaffSidebar";
+import Header from "../../components/Header";
+import { ClipboardList, CheckCircle, Loader, Briefcase, Clock, Activity } from "lucide-react";
+import StatCard from "../../components/StatCard";
 
+const COLORS = ["#fbbf24", "#3b82f6", "#10b981"];
 
 const StaffDashboard = () => {
+    const dispatch = useDispatch();
+    const { stats, recentTasks, recentActivities, loading } =
+        useSelector((state) => state.staffDashboard);
 
-    const projects = [
-        { id: 1, title: 'E-commerce Platform', client: 'Acme Corp', status: 'In Progress', progress: 65, deadline: '2024-12-15', assignees: ['John', 'Sarah'], tasks: 24 },
-        { id: 2, title: 'Mobile App Development', client: 'Tech Solutions Inc', status: 'In Progress', progress: 40, deadline: '2024-11-30', assignees: ['Mike', 'Emma'], tasks: 18 },
-        { id: 3, title: 'Dashboard Redesign', client: 'Global Enterprises', status: 'On Hold', progress: 20, deadline: '2024-12-20', assignees: ['Anna'], tasks: 12 },
-    ];
+    useEffect(() => {
+        dispatch(fetchStaffDashboardData());
+    }, [dispatch]);
 
-    const activities = [
-        { id: 1, action: 'Client Added', entity: 'Acme Corp', user: 'Admin', timestamp: '2 hours ago', type: 'create' },
-        { id: 2, action: 'Project Updated', entity: 'E-commerce Platform', user: 'John Doe', timestamp: '4 hours ago', type: 'update' },
-        { id: 3, action: 'Task Completed', entity: 'Login Module', user: 'Sarah Smith', timestamp: '6 hours ago', type: 'complete' },
-        { id: 4, action: 'Client Status Changed', entity: 'Global Enterprises', user: 'Admin', timestamp: '1 day ago', type: 'update' },
-    ];
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen bg-gray-50">
+                <Loader className="animate-spin text-blue-600" size={40} />
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">
-            {/* Sidebar */}
             <StaffSidebar />
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-auto mx-4">
-                <Header title={"Dashboard"} description={"Welcome back! Here's your dashboard overview"} />
+            <main className="flex-1 overflow-auto mx-6 space-y-6 pb-6">
+                <Header title="Dashboard" description="Your work summary and progress" />
 
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <StatCard
-                            title="Active Clients"
-                            value="10"
-                            icon={<Users className="w-6 h-6 text-blue-600" />}
-                        />
-                        <StatCard
-                            title="Projects in Progress"
-                            value="4"
-                            icon={<FolderKanban className="w-6 h-6 text-green-600" />}
-                        />
-                        <StatCard
-                            title="Total Tasks"
-                            value="50"
-                            icon={<CheckCircle className="w-6 h-6 text-purple-600" />}
-                        />
-                        <StatCard
-                            title="Overdue Items"
-                            value="3"
-                            icon={<AlertCircle className="w-6 h-6 text-red-600" />}
-                        />
-                    </div>
+                {/* Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <StatCard
+                        title={"My Projects"}
+                        value={stats?.myProjects}
+                        icon={<Briefcase className="w-6 h-6 text-blue-600" />}
+                    />
+                    <StatCard
+                        title={"My Tasks"}
+                        value={stats.myTasks}
+                        icon={<ClipboardList className="w-6 h-6 text-red-600" />}
+                    />
+                    <StatCard
+                        title={"Pending Tasks"}
+                        value={stats.pendingTasks}
+                        icon={<Clock className="w-6 h-6 text-yellow-600" />}
+                    />
+                    <StatCard
+                        title={"Completed"}
+                        value={stats.completedTasks}
+                        icon={<CheckCircle className="w-6 h-6 text-green-600" />}
+                    />
+                </div>
 
-                    {/* Projects Overview */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-lg font-semibold mb-4">Projects Overview</h3>
-                            <div className="space-y-4">
-                                {projects.map(project => (
-                                    <div key={project.id} className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium text-gray-700">{project.title}</span>
-                                            <span className="text-sm text-gray-500">{project.progress}%</span>
-                                        </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-2">
-                                            <div
-                                                className={`h-2 rounded-full ${project.progress > 60 ? 'bg-green-500' :
-                                                    project.progress > 30 ? 'bg-yellow-500' : 'bg-red-500'
-                                                    }`}
-                                                style={{ width: `${project.progress}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                {/* Recent Tasks */}
+                <div className="bg-white p-6 rounded-xl shadow border">
+                    <h3 className="text-lg font-semibold mb-4">Recent Tasks</h3>
+                    {recentTasks?.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left border">
+                                <thead className="bg-gray-100 text-gray-600">
+                                    <tr>
+                                        <th className="px-4 py-2 border">Title</th>
+                                        <th className="px-4 py-2 border">Project</th>
+                                        <th className="px-4 py-2 border">Due Date</th>
+                                        <th className="px-4 py-2 border">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {recentTasks.map((task) => (
+                                        <tr
+                                            key={task._id}
+                                            className="border-b hover:bg-gray-50 transition"
+                                        >
+                                            <td className="px-4 py-2 border">{task.title}</td>
+                                            <td className="px-4 py-2 border">
+                                                {task.projectId?.title || "—"}
+                                            </td>
+                                            <td className="px-4 py-2 border">
+                                                {new Date(task.dueDate).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-4 py-2 border">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-medium ${task.status === "Completed"
+                                                        ? "bg-green-100 text-green-700"
+                                                        : task.status === "In Progress"
+                                                            ? "bg-blue-100 text-blue-700"
+                                                            : "bg-yellow-100 text-yellow-700"
+                                                        }`}
+                                                >
+                                                    {task.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
+                    ) : (
+                        <p className="text-gray-500 text-center py-10">No recent tasks found.</p>
+                    )}
+                </div>
 
-                        {/* Recent Activity */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-                            <div className="space-y-4">
-                                {activities.slice(0, 5).map(activity => (
-                                    <div key={activity.id} className="flex items-start gap-3">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activity.type === 'create' ? 'bg-green-100 text-green-600' :
-                                            activity.type === 'update' ? 'bg-blue-100 text-blue-600' :
-                                                'bg-purple-100 text-purple-600'
-                                            }`}>
-                                            <Activity size={16} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                                            <p className="text-xs text-gray-500">{activity.entity} • {activity.timestamp}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                {/* Recent Activities */}
+                <div className="bg-white p-6 rounded-xl shadow border">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <Activity size={18} className="text-blue-600" />
+                        Recent Activities
+                    </h3>
+                    <ul className="divide-y divide-gray-200">
+                        {recentActivities?.length > 0 ? (
+                            recentActivities.map((a) => (
+                                <li key={a._id} className="py-3">
+                                    <p className="text-sm text-gray-800">{a.action}</p>
+                                    <p className="text-xs text-gray-500">
+                                        {new Date(a.createdAt).toLocaleString()}
+                                    </p>
+                                </li>
+                            ))
+                        ) : (
+                            <p className="text-gray-500 text-center py-6">
+                                No recent activity found.
+                            </p>
+                        )}
+                    </ul>
                 </div>
             </main>
         </div>
     );
-}
+};
 
 export default StaffDashboard;

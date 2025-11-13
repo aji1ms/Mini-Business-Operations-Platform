@@ -37,7 +37,6 @@ export const addProject = async (req, res) => {
 
         res.status(201).json({ message: "Project created successfully", project: populatedProject });
     } catch (error) {
-        console.error("Error creating project:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -79,7 +78,6 @@ export const getAllProjects = async (req, res) => {
             projects,
         });
     } catch (error) {
-        console.error("Error fetching projects:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -101,7 +99,6 @@ export const getProjectById = async (req, res) => {
             project,
         });
     } catch (error) {
-        console.error("Error fetching project:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -160,7 +157,6 @@ export const updateProject = async (req, res) => {
             project: updatedProject,
         });
     } catch (error) {
-        console.error("Error updating project:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -184,7 +180,6 @@ export const deleteProject = async (req, res) => {
 
         res.status(200).json({ message: "Project deleted successfully" });
     } catch (error) {
-        console.error("Error deleting project:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

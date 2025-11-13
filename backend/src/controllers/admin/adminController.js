@@ -38,7 +38,6 @@ export const loginAdmin = async (req, res) => {
             token,
         });
     } catch (error) {
-        console.error("Error logging in admin:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -67,7 +66,6 @@ export const getAdminInfo = async (req, res) => {
             admin,
         });
     } catch (error) {
-        console.error("Error fetching admin info:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -79,7 +77,6 @@ export const logoutAdmin = async (req, res) => {
         clearJWT(res, "adminToken");
         return res.status(200).json({ message: "Admin logged out successfully" });
     } catch (error) {
-        console.error("Error logging out admin:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };

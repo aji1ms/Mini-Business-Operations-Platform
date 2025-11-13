@@ -1,6 +1,6 @@
 import express from "express";
-import authenticateUser from "../middlewares/authMiddleware.js";
-import { getMyProjects, getProjectById, updateProjectStatus } from "../controllers/staff/projectController.js";
+import authenticateUser from "../../middlewares/authMiddleware.js";
+import { getMyProjects, getProjectById, updateProjectStatus } from "../../controllers/staff/projectController.js";
 
 const router = express.Router();
 

@@ -42,7 +42,6 @@ export const getMyTasks = async (req, res) => {
             tasks,
         });
     } catch (error) {
-        console.error("Error fetching staff tasks:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -69,7 +68,6 @@ export const getTaskById = async (req, res) => {
             task,
         });
     } catch (error) {
-        console.error("Error fetching task:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -112,7 +110,6 @@ export const updateTaskStatus = async (req, res) => {
             task: updatedTask,
         });
     } catch (error) {
-        console.error("Error updating task:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

@@ -38,7 +38,6 @@ export const registerUser = async (req, res) => {
             }
         });
     } catch (error) {
-        console.log("Error regiser user:", error)
         res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -82,7 +81,6 @@ export const loginUser = async (req, res) => {
             token,
         });
     } catch (error) {
-        console.log("error login user: ", error)
         res.status(500).json({ message: "Error logging in", error: error.message });
     }
 };
@@ -105,7 +103,6 @@ export const getUserInfo = async (req, res) => {
             user,
         });
     } catch (error) {
-        console.error("Error fetching user info:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -117,7 +114,6 @@ export const logoutUser = async (req, res) => {
         clearJWT(res, "userToken");
         res.status(200).json({ message: "User Logged out successfully" });
     } catch (error) {
-        console.error("Error logging out:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

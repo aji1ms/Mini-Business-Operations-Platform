@@ -34,7 +34,6 @@ export const addClient = async (req, res) => {
 
         return res.status(201).json({ message: "Client added successfully", client });
     } catch (error) {
-        console.error("Error adding client:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -85,7 +84,6 @@ export const getAllClients = async (req, res) => {
             clients,
         });
     } catch (error) {
-        console.error("Error fetching clients:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -100,7 +98,6 @@ export const getClientById = async (req, res) => {
 
         return res.status(200).json({ message: "Client fetched successfully", client });
     } catch (error) {
-        console.error("Error fetching client:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -134,7 +131,6 @@ export const updateClient = async (req, res) => {
 
         return res.status(200).json({ message: "Client updated successfully", client });
     } catch (error) {
-        console.error("Error updating client:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -157,7 +153,6 @@ export const deleteClient = async (req, res) => {
 
         return res.status(200).json({ message: "Client deleted successfully" });
     } catch (error) {
-        console.error("Error deleting client:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };

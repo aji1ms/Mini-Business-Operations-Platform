@@ -3,14 +3,18 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDb from "./config/db.js";
-import staffRoute from "./routes/staffRoutes.js";
-import adminRoute from "./routes/adminRoutes.js";
-import projectRoute from "./routes/projectRoutes.js";
-import clientRoute from "./routes/clientRoutes.js";
-import taskRoute from "./routes/taskRoutes.js";
-import activityRoute from "./routes/activityRoutes.js";
-import staffProjectRoute from "./routes/staffProjectRoutes.js";
-import staffTaskRoutes from "./routes/staffTaskRoutes.js";
+
+import adminRoute from "./routes/admin/adminRoutes.js";
+import projectRoute from "./routes/admin/projectRoutes.js";
+import clientRoute from "./routes/admin/clientRoutes.js";
+import taskRoute from "./routes/admin/taskRoutes.js";
+import activityRoute from "./routes/admin/activityRoutes.js";
+import dashboardRoutes from "./routes/admin/dashboardRoute.js";
+
+import staffTaskRoutes from "./routes/staff/staffTaskRoutes.js";
+import staffRoute from "./routes/staff/staffRoutes.js";
+import staffProjectRoute from "./routes/staff/staffProjectRoutes.js";
+import staffDashboardRoutes from "./routes/staff/staffDashboard.js";
 
 dotenv.config();
 const app = express();
@@ -33,6 +37,7 @@ app.use(cookieParser());
 connectDb();
 
 // Admin
+app.use("/api/admin/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoute);
 app.use("/api/staff", staffRoute);
 app.use("/api/admin/project", projectRoute);
@@ -41,6 +46,7 @@ app.use("/api/admin/client", clientRoute);
 app.use("/api/admin/activity", activityRoute);
 
 // Staff
+app.use("/api/staff/dashboard", staffDashboardRoutes);
 app.use("/api/staff/projects", staffProjectRoute);
 app.use("/api/staff/tasks", staffTaskRoutes);
 

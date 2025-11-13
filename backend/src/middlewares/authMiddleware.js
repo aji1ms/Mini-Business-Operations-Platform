@@ -12,7 +12,6 @@ const authenticateUser = (allowedRoles = [], cookieName = "jwt") => {
 
             const JWT_SECRET = process.env.JWT_SECRET;
             if (!JWT_SECRET) {
-                console.error("⚠️ JWT_SECRET not found in environment variables");
                 res.status(500).json({ message: "JWT secret is not defined" });
                 return;
             }

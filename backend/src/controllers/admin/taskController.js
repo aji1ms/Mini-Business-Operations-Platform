@@ -61,7 +61,6 @@ export const addTask = async (req, res) => {
             task: populatedTask,
         });
     } catch (error) {
-        console.error("Error adding task:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -104,7 +103,6 @@ export const getAllTasks = async (req, res) => {
             tasks,
         });
     } catch (error) {
-        console.error("Error fetching tasks:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -145,7 +143,6 @@ export const updateTask = async (req, res) => {
             task: updatedTask,
         });
     } catch (error) {
-        console.error("Error updating task:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -171,7 +168,6 @@ export const deleteTask = async (req, res) => {
             message: "Task deleted successfully",
         });
     } catch (error) {
-        console.error("Error deleting task:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
