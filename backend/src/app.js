@@ -40,13 +40,13 @@ connectDb();
 // Admin
 app.use("/api/admin/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoute);
-app.use("/api/staff", staffRoute);
 app.use("/api/admin/project", projectRoute);
 app.use("/api/admin/task", taskRoute);
 app.use("/api/admin/client", clientRoute);
 app.use("/api/admin/activity", activityRoute);
 
 // Staff
+app.use("/api/staff", staffRoute);
 app.use("/api/staff/dashboard", staffDashboardRoutes);
 app.use("/api/staff/projects", staffProjectRoute);
 app.use("/api/staff/tasks", staffTaskRoutes);

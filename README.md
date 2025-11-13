@@ -289,17 +289,11 @@ npm run dev
 Frontend will run on `http://localhost:5173`
 
 ---
-## 🧑‍💻 Developer
+## 📄 Documentation
 
-<div align="center">
-
-**Ajims Ismail**  
-*Full Stack Developer (MERN)*
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/ajims-ismail/)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=flat-square&logo=github)](https://github.com/aji1ms)
-
-</div>
+- [System Architecture](docs/System_Architecture.pdf)
+- [Project Delivery Document](docs/Project_Delivery.pdf)
+- [Team Mentorship Document](docs/Team_Mentorship.pdf)
 
 ---
 
