@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import StaffSidebar from "../../components/StaffSidebar";
 import { Search, Filter, Eye, Edit, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
-import StaffProjectModal from "../../components/tStaffProjectModal";
+import StaffProjectModal from "../../components/StaffProjectModal";
 
 const StaffProject = () => {
     const dispatch = useDispatch();
