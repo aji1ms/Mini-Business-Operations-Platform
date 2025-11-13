@@ -51,4 +51,4 @@ app.use("/api/staff/projects", staffProjectRoute);
 app.use("/api/staff/tasks", staffTaskRoutes);
 
 const PORT = process.env.PORT || 3008;
-app.listen(PORT, () => console.log('Server Running....'));              
+app.listen(PORT, "0.0.0.0", () => console.log('Server Running....'));              
