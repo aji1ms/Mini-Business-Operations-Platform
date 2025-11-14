@@ -82,8 +82,11 @@ export const getAllTasks = async (req, res) => {
         const limitNumber = parseInt(limit, 10);
         const skip = (pageNumber - 1) * limitNumber;
 
-        const [totalTasks, tasks] = await Promise.all([
+        const [totalTasks, pendingTasks, taskInProgress, completedTasks, tasks] = await Promise.all([
             Task.countDocuments(query),
+            Task.countDocuments({ status: "Pending" }),
+            Task.countDocuments({ status: "In Progress" }),
+            Task.countDocuments({ status: "Completed" }),
             Task.find(query)
                 .populate("projectId", "title status")
                 .populate("assignedTo", "name email role")
@@ -94,7 +97,12 @@ export const getAllTasks = async (req, res) => {
 
         return res.status(200).json({
             message: "Tasks fetched successfully",
-            summary: { totalTasks },
+            summary: {
+                totalTasks,
+                pendingTasks,
+                taskInProgress,
+                completedTasks,
+            },
             pagination: {
                 page: pageNumber,
                 totalPages: Math.ceil(totalTasks / limitNumber),

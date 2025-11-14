@@ -60,8 +60,11 @@ export const getAllClients = async (req, res) => {
         const limitNumber = Number(limit);
         const skip = (pageNumber - 1) * limitNumber;
 
-        const [totalClients, totalFiltered, clients] = await Promise.all([
+        const [totalClients, activeClients, pausedClients, closedClients, totalFiltered, clients] = await Promise.all([
             Client.countDocuments(),
+            Client.countDocuments({ status: "Active" }),
+            Client.countDocuments({ status: "Paused" }),
+            Client.countDocuments({ status: "Closed" }),
             Client.countDocuments(query),
             Client.find(query)
                 .populate("createdBy", "name email")
@@ -74,6 +77,9 @@ export const getAllClients = async (req, res) => {
             message: "Clients fetched successfully",
             summary: {
                 totalClients,
+                activeClients,
+                pausedClients,
+                closedClients,
                 totalFiltered,
             },
             pagination: {

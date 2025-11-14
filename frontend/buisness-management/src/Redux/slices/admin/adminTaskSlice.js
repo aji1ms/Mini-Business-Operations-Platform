@@ -3,7 +3,12 @@ import axios from "axios";
 
 const initialState = {
     tasks: [],
-    summary: { totalTasks: 0 },
+    summary: {
+        totalTasks: 0,
+        pendingTasks: 0,
+        taskInProgress: 0,
+        completedTasks: 0,
+    },
     pagination: { page: 1, totalPages: 0, limit: 6 },
     loading: false,
     error: null,
@@ -119,6 +124,7 @@ const taskSlice = createSlice({
             })
             .addCase(fetchTasks.fulfilled, (state, action) => {
                 state.loading = false;
+                state.summary = action.payload.summary;
                 const payload = action.payload || {};
                 if (Array.isArray(payload.tasks)) {
                     state.tasks = payload.tasks;
@@ -127,13 +133,6 @@ const taskSlice = createSlice({
                 } else {
                     state.tasks = payload.tasks || payload.data || [];
                 }
-
-                if (payload.totalTasks !== undefined) {
-                    state.summary.totalTasks = payload.totalTasks;
-                } else if (payload.summary?.totalTasks !== undefined) {
-                    state.summary.totalTasks = payload.summary.totalTasks;
-                }
-
                 if (payload.pagination) {
                     state.pagination = {
                         ...state.pagination,

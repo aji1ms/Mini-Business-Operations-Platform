@@ -5,6 +5,9 @@ const initialState = {
     projects: [],
     summary: {
         totalProjects: 0,
+        projectsInProgress: 0,
+        completedProjects: 0,
+        ClosedProjects: 0,
         totalFiltered: 0,
     },
     pagination: {

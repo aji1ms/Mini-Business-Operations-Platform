@@ -57,8 +57,11 @@ export const getAllProjects = async (req, res) => {
         const limitNumber = Number(limit);
         const skip = (pageNumber - 1) * limitNumber;
 
-        const [totalProjects, totalFiltered, projects] = await Promise.all([
+        const [totalProjects, projectsInProgress, completedProjects, ClosedProjects, totalFiltered, projects] = await Promise.all([
             Project.countDocuments(),
+            Project.countDocuments({ status: "In Progress" }),
+            Project.countDocuments({ status: "Completed" }),
+            Project.countDocuments({ status: "Closed" }),
             Project.countDocuments(query),
             Project.find(query)
                 .populate("clientId", "name company")
@@ -70,7 +73,13 @@ export const getAllProjects = async (req, res) => {
 
         res.status(200).json({
             message: "Projects fetched successfully",
-            summary: { totalProjects, totalFiltered },
+            summary: {
+                totalProjects,
+                projectsInProgress,
+                completedProjects,
+                ClosedProjects,
+                totalFiltered
+            },
             pagination: {
                 page: pageNumber,
                 totalPages: Math.ceil(totalFiltered / limitNumber),

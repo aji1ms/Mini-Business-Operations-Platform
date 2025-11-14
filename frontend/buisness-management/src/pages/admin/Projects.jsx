@@ -78,7 +78,22 @@ const Projects = () => {
                     <StatCard
                         title={"Total Projects"}
                         value={summary?.totalProjects}
+                        icon={<NotepadText className="w-6 h-6 text-purple-600" />}
+                    />
+                    <StatCard
+                        title={"In Progress"}
+                        value={summary?.projectsInProgress}
                         icon={<NotepadText className="w-6 h-6 text-yellow-600" />}
+                    />
+                    <StatCard
+                        title={"Completed"}
+                        value={summary?.completedProjects}
+                        icon={<NotepadText className="w-6 h-6 text-green-600" />}
+                    />
+                    <StatCard
+                        title={"Closed"}
+                        value={summary?.ClosedProjects}
+                        icon={<NotepadText className="w-6 h-6 text-red-600" />}
                     />
                 </div>
 

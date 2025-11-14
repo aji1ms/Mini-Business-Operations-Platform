@@ -144,9 +144,24 @@ const Clients = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <StatCard
-                        title={"Total CLients"}
+                        title={"Total Clients"}
                         value={summary?.totalClients}
+                        icon={<Users className="w-6 h-6 text-purple-600" />}
+                    />
+                    <StatCard
+                        title={"Active Clients"}
+                        value={summary?.activeClients}
+                        icon={<Users className="w-6 h-6 text-green-600" />}
+                    />
+                    <StatCard
+                        title={"Paused Clients"}
+                        value={summary?.pausedClients}
                         icon={<Users className="w-6 h-6 text-yellow-600" />}
+                    />
+                    <StatCard
+                        title={"Closed Clients"}
+                        value={summary?.closedClients}
+                        icon={<Users className="w-6 h-6 text-red-600" />}
                     />
                 </div>
 

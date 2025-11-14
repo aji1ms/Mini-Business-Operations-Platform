@@ -5,6 +5,9 @@ const initialState = {
     clients: [],
     summary: {
         totalClients: 0,
+        activeClients: 0,
+        pausedClients: 0,
+        closedClients: 0,
         totalFiltered: 0,
     },
     pagination: {

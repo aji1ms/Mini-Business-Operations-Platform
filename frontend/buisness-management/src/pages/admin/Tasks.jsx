@@ -29,7 +29,6 @@ const Tasks = () => {
     const dispatch = useDispatch();
     const { tasks, pagination, filters, loading, summary, error } = useSelector((s) => s.tasks);
     const { projects } = useSelector((s) => s.projects);
-
     const [showModal, setShowModal] = useState(false);
     const [modalMode, setModalMode] = useState("add");
     const [selectedTask, setSelectedTask] = useState(null);
@@ -170,9 +169,24 @@ const Tasks = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                         <StatCard
-                            title={"Total Projects"}
+                            title={"Total Tasks"}
                             value={summary?.totalTasks}
+                            icon={<NotepadText className="w-6 h-6 text-purple-600" />}
+                        />
+                        <StatCard
+                            title={"Pending"}
+                            value={summary?.pendingTasks}
+                            icon={<NotepadText className="w-6 h-6 text-red-600" />}
+                        />
+                        <StatCard
+                            title={"Progress"}
+                            value={summary?.taskInProgress}
                             icon={<NotepadText className="w-6 h-6 text-yellow-600" />}
+                        />
+                        <StatCard
+                            title={"Completed"}
+                            value={summary?.completedTasks}
+                            icon={<NotepadText className="w-6 h-6 text-green-600" />}
                         />
                     </div>
 
